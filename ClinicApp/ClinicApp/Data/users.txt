@@ -1,0 +1,11 @@
+﻿1|marko_markovic|password|0
+2|petar_petrovic|1234|1
+3|stefan_stefanovic|ovojesifra|2
+4|jelena_mikovic|jelavolimarka|3
+5|marko_stojkovic|markovolijelu|0
+6|ognjen_radovanovic|ognjennevolinikoga|1
+7|danilo_babic|PaSSwOrD|2
+8|stefan_bogdanovic|programer|3
+9|aleksandra_balazevic|bb0db3ff9cca761dd697b6bd74fcafe19e05bf5edc6116c830a1e48628581c70|2
+10|relja_radeka|8d79b0cc9c586e3759ff37044c50d080e777714bd2b7fdf530c0a00f03e90b45|1
+11|nemanja_mitric|0cb1c5752888ffc2cee1aa3132357232186929cfcf0106c1271101772edc88cc|3
