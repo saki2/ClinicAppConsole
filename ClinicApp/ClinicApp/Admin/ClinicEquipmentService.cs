@@ -1,37 +1,33 @@
 using ClinicApp.Admin;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 public static class ClinicEquipmentService 
 {
-    static List<ClinicEquipment> HospitalEquipmentList { get; set;}
+    static public List<ClinicEquipment> ClinicEquipmentList { get; set;}
 
     static ClinicEquipmentService()
     {
-        HospitalEquipmentList = new List<ClinicEquipment>
-                {
-                    new ClinicEquipment { Id = 1, Name = "Syrgery Knife", RoomId = 1, Amount = 6, Type = EquipmentType.Operations},
-                    new ClinicEquipment { Id = 2, Name = "Operating Table", RoomId = 1, Amount = 2, Type = EquipmentType.RoomFurniture},
-                    new ClinicEquipment { Id = 3, Name = "Bench", RoomId = 2, Amount = 4, Type = EquipmentType.Hallway},
-                    new ClinicEquipment { Id = 4, Name = "Dental Mirror", RoomId = 4, Amount = 10, Type = EquipmentType.Examinations},
-                    new ClinicEquipment { Id = 5, Name = "Sickle Probe", RoomId = 4, Amount = 10, Type = EquipmentType.Examinations}
-                };
+        ClinicEquipmentList = LoadEquipment();
+                
     }
-    public static List<ClinicEquipment> GetAll() => HospitalEquipmentList;
+    public static List<ClinicEquipment> GetAll() => ClinicEquipmentList;
 
-    public static ClinicEquipment? Get(int id) => HospitalEquipmentList.FirstOrDefault(p => p.Id == id);
+    public static ClinicEquipment? Get(int id) => ClinicEquipmentList.FirstOrDefault(p => p.Id == id);
 
     public static void Add(ClinicEquipment heq)
     {
-        heq.Id = HospitalEquipmentList.Last().Id + 1; 
-        HospitalEquipmentList.Add(heq);
+        heq.Id = ClinicEquipmentList.Last().Id + 1; 
+        ClinicEquipmentList.Add(heq);
     }
     public static void Delete(int id)
     {
         var heq = Get(id);
         if (heq is null)
             return;
-        HospitalEquipmentList.Remove(heq);
+        ClinicEquipmentList.Remove(heq);
     }
     public static void AddToRoom(int eqId, int roomId)
     {
@@ -40,13 +36,14 @@ public static class ClinicEquipmentService
             return;
         heq.RoomId = roomId;
     }
+    //---------------SEARCH AND FILTERING-------------------------------------------------------------
     public static List<ClinicEquipment> Search(string searchTerm)
     {
         searchTerm = searchTerm.ToLower();
         var results = new List<ClinicEquipment>();
-        foreach(var item in HospitalEquipmentList)
+        foreach(var item in ClinicEquipmentList)
         {
-            if(item.Name.ToLower().Contains(searchTerm) || item.Type.ToString().ToLower().Contains(searchTerm) || ClinicEquipmentService.Get(item.RoomId).Name.ToLower().Contains(searchTerm))
+            if(item.Name.ToLower().Contains(searchTerm) || item.Type.ToString().ToLower().Contains(searchTerm) || ClinicRoomService.Get(item.RoomId).Name.ToLower().Contains(searchTerm))
             {
                 results.Add(item);
             }
@@ -88,5 +85,61 @@ public static class ClinicEquipmentService
             }
         }
         return results;
+    }
+    //--------------FILES STUFF-----------------
+    public static void PersistEquipment()
+    {
+        File.Delete("../../../Admin/Data/equipment.txt");
+        foreach (ClinicEquipment eq in ClinicEquipmentList)
+        {
+            string newLine = Convert.ToString(eq.Id) + "|" + eq.Name + "|" + Convert.ToString(eq.Amount) + "|" + Convert.ToString(eq.RoomId) + "|" + Convert.ToString(eq.Type);
+            using (StreamWriter sw = File.AppendText("../../../Admin/Data/equipment.txt"))
+            {
+                sw.WriteLine(newLine);
+            }
+        }
+
+    }
+    public static List<ClinicEquipment> LoadEquipment()
+    {
+        List<ClinicEquipment> eqList = new List<ClinicEquipment>();
+        using (StreamReader reader = new StreamReader("../../../Admin/Data/equipment.txt"))
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                ClinicEquipment eq = ParseEquipment(line);
+                eqList.Add(eq);
+            }
+        }
+        return eqList;
+    }
+    static ClinicEquipment ParseEquipment(string line)
+    {
+        string[] parameteres = line.Split("|");
+        EquipmentType type = EquipmentType.Examinations;
+        switch (parameteres[4])
+        {
+            case "Operations":
+                type = EquipmentType.Operations;
+                break;
+            case "Hallway":
+                type = EquipmentType.Hallway;
+                break;
+            case "RoomFurniture":
+                type = EquipmentType.RoomFurniture;
+                break;
+            case "Examinations":
+                type = EquipmentType.Examinations;
+                break;
+        }
+        ClinicEquipment eq = new ClinicEquipment { 
+            Id = Convert.ToInt32(parameteres[0]), 
+            Name = parameteres[1], 
+            Amount = Convert.ToInt32(parameteres[2]), 
+            RoomId = Convert.ToInt32(parameteres[3]), 
+            Type = type };
+
+        return eq;
     }
 }

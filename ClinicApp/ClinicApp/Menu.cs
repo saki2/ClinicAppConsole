@@ -165,7 +165,7 @@ namespace ClinicApp
         {
             switch (user.Role)
             {
-                case Role.Admin: RegisterAdmin(); Admin.AdminMenu(); return;
+                case Role.Admin: RegisterAdmin(); Users.Admin.AdminMenu(); return;
                 case Role.Secretary: RegisterSecretary(); Secretary.SecretaryMenu(); return;
                 case Role.Doctor: RegisterDoctor(); Doctor.DoctorMenu(); return;
                 case Role.Patient: RegisterPatient(); Patient.PatientMenu(); return;
